@@ -1,14 +1,13 @@
-MULTIPLY BY 4, ADD 3, STORE VALUE
+MULTIPLY BY 4, ADD 1, STORE VALUE
 
-(0)0000011		Add R0, 3
-(1)0000100		Add R1, 0
-(0)0001001		Add R2, 1
-
+(1)1110101		Init R2, 1
+(0)1110010		Init R1, 0
+(0)1110001		Init R0, 1
 (1)1111000		ShiftL
 (1)1111000		ShiftL
 (1)0000010		Add R0, R2
 (1)0110001		Store R0, R1
 
 1 Shift Left 2 times = 4
-4 + 3 = 7
+4 + 1 = 5
 Store seven in Mem[0]

@@ -92,7 +92,7 @@ def simulate(I,M):
 
 
 def main():
-    input_file = open("p3_group_9_p1_mc.txt", "r")
+    input_file = open("p3_group_9_p0_mc.txt", "r")
     input_pattern = open("patternA.txt", "r")
     Nlines = 0  # How many instrs total in input.txt
     Instruction = []  # all instructions will be stored here
