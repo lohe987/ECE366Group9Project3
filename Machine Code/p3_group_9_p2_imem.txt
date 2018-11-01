@@ -1,0 +1,195 @@
+Init R2, 1            11110101                   R2=1
+ShiftL		            01111000		        ShiftL    r2=2
+ShiftL		            01111000	        	ShiftL    r2=4
+ShiftL		            01111000		        ShiftL    r2=8
+ShiftL		            01111000		        ShiftL    r2=16 comparison bits
+Add R3, R2	          10001110			            R3=16
+Init R2, 1	          11110101		             
+Store R3, (R2)        10111110                        M[1] = 16 compare bits
+Init R2, 1            11110101                         R2=1
+Add R2, R2	          00001010			          R2=2
+Init R1, 0	          01110010		               R1=0    
+Store R1, (R2)        00110110			               M[2]=0
+/*R0=M[4]						
+Store dest of done:			       note that each loop location has been preset in data memory locations so it would be declared in an array just like this projects comparing array
+R0=M[5]
+Store dest of one:
+R0 = M[6]
+Store dest of L2:
+r0 = M[7]
+store dest of best2
+r0=m[8]
+store dest of best
+r0=m[9]
+store dest of finish
+r0=m[10]
+store dest of exit
+r0=m[11]
+store counter for amount of numbers */
+
+L1:
+Init R1, 1		  11110011			R1=1
+Init R2, 1		  11110101			R2=1
+Add R1, R1		  00000101			R1=2
+Add R1, R2		  00000110			R1=3
+Load R0, (R1)		00100001			R0=Array from M[3]
+Add R1, R2		  00000110			R1=4
+Load R1, (R1)		10100101			R1=Counter for 1 bits M[4]
+Init R2, 1	    01110101   				          Init R2, 1
+Add R3, R2		  10001110		      Add R3, R2
+Init R2, 0		  01110100			          Init R2, 0
+Store R2, (R3)  10111011    		     Store, R2, R3
+Load R2, (R0)   00101000
+XORR2R1         11111100
+
+L2:                                   //loop to xor bits
+Init R1, 0		01110010				R1=0
+XORR2R1			  11111100		conditional to see if we should quit looping based upon incrementally anding xored value with 1 and shifting right
+init r3, 0		11110110		R3=0
+SltR1 R3, R2	11101110		as long as xored valued is not zero then do not quit this loop
+BezR1, R0		  01010000		jump/quit to done
+Add R3, R2		10001110		r3 now equals xored value as well
+Init R2, 1		11110101		r3=1
+ShiftL			  01111000		shift xor
+Add R2, R1		00001001		r2=3 or m[3]
+Store R3, (R2)10111110		current xor gets stored in m[3]
+ANDR3         01111101              AND xor lsb with 1
+Init R2, 1    11110101
+ShiftL			  01111000		r2=2
+ADD R2, R1		00001001		r2=3
+Load R2, (R2) 10101010		r2=xor
+ShiftR			  11111001		xor/2 or get rid of lsb in xor
+Init R1, 1		11110011		r1=1
+SltR1 R3, R1	11101101		check if and value is equal to 1
+Init R2, 1		11110101		r2=1
+ShiftL			  01111000		r2=2				
+ShiftL			  01111000		r2=4
+Add R2, R1		00001001		r2=5
+Load R0, (R2)	00100010		r0=memory location of where to jump
+BezR1 R0		  01010000		if the ANDR3 was a 1AND1 then we will jump to 'one' func
+Init R1, 1		11110101		R1=1
+Add R2, R1		00001001		memory location of L2 loop			
+Load R0, (R2)	00100010		load L2 location for upcoming jump
+ShiftR			  01111001		memory is now looking at xor
+Load R2, (R2)	10101010		load xor for L2 initial conditionals
+Jump R0			  11000000		jump back to beginning of this loop
+
+one:
+Init R1, 1   	11110011
+Sub R2, R1		10011001		r2=m[4]
+ShiftR			  11111001		r2=m[2]
+Load R1, (R2)	10100110		load number of ones in counter
+Init R3, 1		01110111		r3=1
+Add R1, R3		10000111		add one to counter since we found a 1 from xor value in previous loop
+Store R1, (R2)00110110		store this into counter value in memory
+Add R2, R3		10001011		move memory location to xor location
+init R0, 1		01110001		r0=1
+Add R0, R2		10000010		R0 = m[4] 
+Load R2, (R2)	10101010		r2=xor value
+Init R3, 1		01110111		r3=1
+Add R0, R3		00000011		R0=m[M5]
+Add R0, R3		00000011		  =m[6]
+Load R1, (R3)	00100111		load location of 'L2' or previous loop
+Jump R1			  10000001		jump to L2
+
+done:
+Init R0, 1		01110001		r0=1
+Load R3, (R0)	10101100		R3=16 bits of 1111111111111111
+Init R2, 1    11110101
+ShiftL			  01111000		R2=2
+Load R0, (R2)	00100010		r0= 1's counted from loop operations Xor/AND
+Sub R3, R0		10011100		111... - # of 1's
+Init R2, 0		01110100		r2=m[0]
+Load R1, (R2)	10100110		r2=top score
+Sub R1, R3		00010111		check to see if R3 total is equal to top score
+Init R0, 1		01110001		R0=1
+Init R2, 1		11110101		R2=1
+ShiftR			  01111001		r2=2
+ShiftR			  01111001		R2=4
+Add R2, R0		10001000		=5
+Add R2, R0		10001000		=6
+Add R2, R0		10001000		=7
+load R0, (R2)	00100010		R0 is now location of 'best2' since top and xor were equal we will add 1 to best matching counter
+BezR1, R0		  01010000		branch to location of 'best2' based upon conditional stated above
+Init R0, 1		01110001		r0=1
+Add R0, R2		10000010		r0 = location of 'best' in memory m[8]
+Init R2, 0    01110100
+load R2, (R2) 10101010		R2=top score	
+sltR1, R3, R2	11101110		check if current xor has more matching bits than the previous best score
+load R2, (R0)	00101000		r2=location 'best' loop now			
+BezR1, R2		  01010110		branch if xor matching bits is greater than the previous best score
+init R2, 1		11110101		reset r2 to 1 if above conditional didn't branch
+add R0, R2		10000010		r0=m[9]
+Load R0, (R0)	10100000		r0 is now location of finish
+Jump R0			  11000000		jump to finish
+
+best:
+Init R0, 0		11110000		r0 =m[0] location of top score
+Store R3, (R0)00111100		store new top score R3 in top score
+Init R0, 1		01110001
+Add R0, R0		00000000		R0=m[2]  total number of best matching #'s
+Init R1, 0		01110010		r1=0
+Store R1, (R0)10110100		reset best matching numbers and store it
+
+best2:
+init R0, 1		01110001
+Add R0, R0		00000000		R0 will equal memory location of best matching #'s
+load R0, (R0)	10100000		that value is loaded into R0
+Init R1, 1		11110011		R1=1
+Add R0, R1		10000001		R0=R0+R1
+
+finish:
+init R2, 1		11110101		R2=1
+ShiftL			  01111000		R2=2
+init R0, 1		01110001		R0=1
+Add R0, R2		10000010		R0=m[3] array values
+load R2, (R0)	00101000		R0 loads values into R2
+ShiftL			  01111000		shift left up until 16 bits has passed and we 
+ShiftL			  01111000		now use a new value in the array for the next
+ShiftL			  01111000		iterations of checking for best scores/matches
+ShiftL			  01111000
+ShiftL			  01111000
+Store R2, (R0)10111000		store value so we can use it once we loop back
+Init R2, 1		11110101
+Sub R0, R2		00010010
+Sub R0, R2		00010010
+Sub R0, R2		00010010
+Sub R0, R2		00010010
+Sub R0, R2		00010010		r[0]=m11
+load R1, (R0)	00100100		counter is loaded from how many numbers are in array
+Add R1, R2		00000110		counter++
+Sub R0, R2		00010010		r0=m[10] or 10
+Init R2, 0		01110100		r2=0
+Add R0, R2		10000010		r2=r0=10
+ShiftL			  01111000		r2=20
+Init R0, 1		01110001		r1=1
+Add R2, R0		10001000		r2= 21, 22, 23, 24, 25
+Add R2, R0		10001000
+Add R2, R0		10001000
+Add R2, R0		10001000
+Add R2, R0		10001000
+ShiftL			  01111000		r2 = 50
+ShiftL			  01111000		r2 = 100
+SltR1 R1, R2	01100110		if R1<100
+Init R0, 1		01110001		r0=1
+Init R2, 1		11110101
+Add R2, R0		10001000		r2=2
+Add R2, R0		10001000		r2=3
+Add R2, R2		00001010		r2=6
+ShiftL			  01111000		r2=12
+Sub R2, R0		00011000		r2=11=m[11]
+Sub R2, R0		00011000		r2=10=m[10]
+load R0, (R2)	00100010		r0 is the location of exit
+bezR1, R0		  11010100		branch to exit
+Init R0, 1		01110001		initiate R0 back to 1 if we don't exit
+Sub R2, R0		00011000
+Sub R2, R0		00011000
+Sub R2, R0		00011000
+Sub R2, R0		00011000		R2=m[6] address of L2
+Load R0, (R2)	00100010		R0 is passed the location of L2
+Jump R0			  11000000		jump to L2
+
+exit:
+Init R0, 1		01110001
+Add R0, R0		00000000
+Load R0, (R0)	10100000
