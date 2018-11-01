@@ -20,7 +20,12 @@ add R0, R0			0 000 0000	//R0 = R0 + R0 = 6
 loop:
 init R1, 0			0 111 0010	//R1 = 0
 sltR1 R3, R2			1 110 1110	//if R3 < R2, R1 = 1
-bezR1 R0			0 101 0000	//R1 = 0, jump to mod
+init R2, 1			1 111 0101	//R2 = 1
+ShiftL				0 111 1000	//R2 = 2
+ShiftL				0 111 1000	//R2 = 4
+ShiftL				0 111 1000	//R2 = 8
+ShiftL				0 111 1000	//R2 = 16
+bezR1 R2			0 101 0010	//if R1 = 0, PC += 16
 init R1, 1			1 111 0011	//R1 = 1
 add R3, R1			1 000 1101	//R3 = R3 + R1 = i + 1
 add R0, R0			0 000 0000	//R0 = R0 + R0 = 12
@@ -36,7 +41,11 @@ jump R2				0 100 0010	//PC = PC - 14
 2nd Part: Mod Calculus
 
 mod:
-init R3, 0                      1 111 0110      //R0 = 6^p
+init R3, 0                      1 111 0110	//R3 = 0
+init R3, 0                      1 111 0110	//R3 = 0
+init R3, 0                      1 111 0110	//R3 = 0
+init R3, 0                      1 111 0110	//R3 = 0
+init R3, 0                      1 111 0110      //R0 = 6^p, R3 = 0
 store R0, (R3)                  0 011 0011      //Store the value of 6^p
 init R1, 1                      1 111 0011      //Set R1 = 1
 add R3, R1                      1 000 1101      //move R3 by 1 to save 17 w/o overwriting 6^p
