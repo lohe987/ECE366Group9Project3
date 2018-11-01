@@ -49,29 +49,37 @@ def simulate(I,NSteps):
         output_file.write("         // M[R" + register2 + "] <- R" + register1 + "\n")
 
     elif (line[1:4] == "010"):
-        register1 = str(int(line[4:6],2))
-        register2 = str(int(line[6:8],2))
+        Rx = (int(line[4:6],2))
+        Ry = (int(line[6:8],2))
         output_file.write("Load R" + register1 + ", (R" + register2 + ")")
         output_file.write("         // R" + register1 + " <- M[R" + register2 + "] \n")
 
-    elif (line[1:4] == "001"):
-        register1 = str(int(line[4:6],2))
-        register2 = str(int(line[6:8],2))
-        output_file.write("Sub R" + register1 + ", R" + register2)
-        output_file.write("         // R" + register1 + " = R" + register1 + " - R" + register2 + "\n")
+    elif (line[1:4] == "001"):          #Rx = Rx - Ry
+        Rx = (int(line[3:4],2)
+        Ry = (int(line[5:6],2)
 
-    elif (line[1:4] == "000"):
-        register1 = str(int(line[4:6], 2))
-        register2 = str(int(line[6:8], 2))
-        output_file.write("Add R" + register1 + ", R" + register2)
-        output_file.write("         // R" + register1 + " = R" + register1 + " + R" + register2 + "\n")
+        Rx = Rx - Ry
+        
+    elif (fetch[1:4] == "000"):         #Rx = Rx + Ry
+        Rx = int(line[3:4], 2)
+        Ry = int(line[5:6], 2)
+        
+        Rx = Rx + Ry
 
-    elif (line[1:6] == "10000"):
-        register = str(int(line[6:8], 2))
-        output_file.write("Jump R" + register)
-        output_file.write("         // PC = PC - R" + register + "\n")
+    elif (fetch[1:6] == "10000"):       #PC -= Rx
+        Rx = int(line[5:7], 2)
+        PC = PC - Rx
 
-    elif (line[1:6] == "10100"):
+    elif (fetch[1:6] == "10100"):       #If R1==0, PC += Rx
+        Rx = int(line[5:7],2)
+        if (Reg[1] == 0):
+            PC = PC + Rx
+        else:
+            PC = PC + 1
+            
+            
+        
+        
         register = str(int(line[6:8], 2))
         output_file.write("bezR1, R" + register)
         output_file.write("         // if R1 ==0: PC = PC + R" + register + " | else: PC++ \n")
