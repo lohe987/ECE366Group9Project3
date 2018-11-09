@@ -1,0 +1,11 @@
+MULTIPLY BY 4, ADD 1, STORE VALUE
+(0)1110001		Init R0, 1
+(1)1110101		Init R2, 1
+(0)1111000		ShiftL
+(0)1111000		ShiftL
+(1)0001000		Add R2, R0
+(1)0111000		Store R2, R0
+
+1 Shift Left 2 times = 4
+4 + 1 = 5
+Store five in Mem[1]
