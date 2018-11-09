@@ -25,11 +25,11 @@ def simulate(I,M):
             PC += 1
 
         elif (fetch[1:8] == "1111001"):
-            Reg[2] >> 1     #ShiftR: R2 >>
+            Reg[2] = Reg[2] >> 1     #ShiftR: R2 >>
             PC += 1
 
         elif (fetch[1:8] == "1111000"):
-            Reg[2] << 1     #ShiftL: R2 <<
+            Reg[2] = Reg[2] << 1  #ShiftL: R2 <<
             PC += 1
 
         elif (fetch[1:5] == "1110"):
@@ -60,28 +60,32 @@ def simulate(I,M):
             PC += 1
 
         elif (fetch[1:4] == "001"):  # Rx = Rx - Ry
-            Rx = int(fetch[3:4], 2)
-            Ry = int(fetch[5:6], 2)
+            Rx = int(fetch[4:6], 2)
+            Ry = int(fetch[6:8], 2)
             Reg[Rx] = Reg[Rx] - Reg[Ry]
             PC += 1
 
         elif (fetch[1:4] == "000"):  # Rx = Rx + Ry
-            Rx = int(fetch[3:4], 2)
-            Ry = int(fetch[5:6], 2)
+            Rx = int(fetch[4:6], 2)
+            Ry = int(fetch[6:8], 2)
             Reg[Rx] = Reg[Rx] + Reg[Ry]
             PC += 1
 
         elif (fetch[1:6] == "10000"):  # PC -= Rx
-            Rx = int(fetch[5:7], 2)
+            Rx = int(fetch[6:8], 2)
             PC = PC - Reg[Rx]
 
-        elif (fetch[1:6] == "10100"):  # If R1==0, PC += Rx
-            Rx = int(fetch[5:7], 2)
-            if (Reg[1] == 0):
+        elif (fetch[1:6] == "10100"):  # If R1==1, PC += Rx
+            Rx = int(fetch[6:8], 2)
+            if (Reg[1] == 1):
                 PC = PC + Reg[Rx]
             else:
                 PC += 1
 
+        elif (fetch[0] == "/"):
+            PC += 1
+        elif (fetch[1:8]=="1111111"):
+            finished = True
         else:
             finished = True
 
@@ -92,8 +96,8 @@ def simulate(I,M):
 
 
 def main():
-    input_file = open("p3_group_9_p0_mc.txt", "r")
-    input_pattern = open("patternA.txt", "r")
+    input_file = open("p3_group_9_p1_mc.txt", "r")
+    input_pattern = open("patternC.txt", "r")
     Nlines = 0  # How many instrs total in input.txt
     Instruction = []  # all instructions will be stored here
     Memory = []

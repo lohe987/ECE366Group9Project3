@@ -9,7 +9,7 @@ for(R3 = 0, R3 < R2, R3++):
 	R0 = R0 + R1 = 3
 	R0 = R0 + R0 = 6
 
-init R0, 1			0 111 0001	//R0 = 1
+init R0, 1			0 111 0001	//R0 = 1			
 init R1, 1			1 111 0011	//R1 = 1
 init R3, 0			1 111 0110	//R3 = 0
 load R2, (R3)			0 010 1011	//R2 = M[R3=0] = p
@@ -18,14 +18,27 @@ add R0, R1			1 000 0001	//R0 = R0 + R1 = 3
 add R0, R0			0 000 0000	//R0 = R0 + R0 = 6
 
 loop:
-init R1, 0			0 111 0010	//R1 = 0
-sltR1 R3, R2			1 110 1110	//if R3 < R2, R1 = 1
-init R2, 1			1 111 0101	//R2 = 1
-ShiftL				0 111 1000	//R2 = 2
-ShiftL				0 111 1000	//R2 = 4
-ShiftL				0 111 1000	//R2 = 8
-ShiftL				0 111 1000	//R2 = 16
-bezR1 R2			0 101 0010	//if R1 = 0, PC += 16
+/
+/
+/
+/
+/
+/
+/
+/
+/
+/
+/
+/
+init R1, 0			0 111 0010	//R1 = 0				
+load R2, (R1)			0 010 1001	//R2 = M[R1=0] = p = 2
+sltR1 R3, R2			1 110 1110	//if R3 < R2, R1 = 1		0 < 2 	1 < 2
+init R2, 1			1 111 0101	// R2 = 1		
+ShiftL				0 111 1000	// R2 = 2
+ShiftL				0 111 1000	// R2 = 4
+ShiftL				0 111 1000	// R2 = 8
+ShiftL				0 111 1000	// R2 = 16
+bezR1 R2			1 101 0010	//if R1 = 1, jump to mod
 init R1, 1			1 111 0011	//R1 = 1
 add R3, R1			1 000 1101	//R3 = R3 + R1 = i + 1
 add R0, R0			0 000 0000	//R0 = R0 + R0 = 12
@@ -35,20 +48,21 @@ add R1, R1			0 000 0101	//R1 = 4
 store R0, (R1)			1 011 0001	//R0 = 12 -> M[R1=4]
 load  R1, (R1)			1 010 0101	//R1 = 12
 add R0, R1			1 000 0001	//R0 = R0 + R1 = 24
-add R0, R0			0 000 0000	//R0 = R0 + R0 = 36
-jump R2				0 100 0010	//PC = PC - 14
+add R0, R0			0 000 0000	//R0 = R0 + R0 = 48
+ShiftL				0 111 1000	//R2 = 32
+jump R2				0 100 0010	//jump to loop
  
 2nd Part: Mod Calculus
 
 mod:
-init R3, 0                      1 111 0110	//R3 = 0
-init R3, 0                      1 111 0110	//R3 = 0
-init R3, 0                      1 111 0110	//R3 = 0
-init R3, 0                      1 111 0110	//R3 = 0
-init R3, 0                      1 111 0110      //R0 = 6^p, R3 = 0
-store R0, (R3)                  0 011 0011      //Store the value of 6^p
+/
+/
+/
+init R3, 1                      1 111 0111      //R0 = 6^p, R3 = 1
+Add R3, R3			0 000 1111	//R3 = 2
+store R0, (R3)                  0 011 0011      //Store the value of 6^p into M[2]
 init R1, 1                      1 111 0011      //Set R1 = 1
-add R3, R1                      1 000 1101      //move R3 by 1 to save 17 w/o overwriting 6^p
+add R3, R1                      1 000 1101      //Move R3 by 1 to save 17 w/o overwriting 6^p
 init R2, 1                      1 111 0101      //Set R2 = 1
 ShiftL                          0 111 1000      //Shift R2 left until it gets to 16 (1 - 10)
 ShiftL                          0 111 1000      //shift from 10 - 100
@@ -59,16 +73,163 @@ Store R2, (R3)                  1 011 1011      //save 17 (R2) in memory
 
 shifting:					//loop the shifting
 ShiftL				0 111 1000      //Shift R2 left until R2 > 6^p
-sltR1 R0, R2 			1 110 0010      //check if 6^p is greater than shifted 17
-bezR1 R3			0 101 0011      //since 6^p is greater than shifted 17 it will keep looping the shift, we go back 3 spaces
-sub R3, R1			0 001 1101      //move R3 to 6^p
-load R0, (R3)			1 010 0011      //r0=6^p
-add R3, R1			1 000 1101      //move R3 to read 17 from mem
-load R3, (R3)	    		1 010 1111      //load 17 into R3 from R3
+sltR1 R2, R0 			1 110 1000      //if R0(6^p) < R2(17 shifted), R1=0
+Add R3, R3			0 000 1111	//R3 = 2
+Add R3, R3			0 000 1111	//R3 = 4
+Add R3, R3			0 000 1111	//R3 = 8
+bezR1 R3			0 101 0011      //jump past "jump" instruction
+/
+/
+jump R3				1 100 0011	//jump back to shifting
+/
+/
+/
+/
+Init R3, 1			0 111 0111	//R3 = 1
+Add R3, R3			0 000 1111	//R3 = 2
+load R0, (R3)			1 010 0011      //r0=6^p loaded from M[2]
+Sub R3, R1			1 000 1101      //move R3 to read 17 from mem
+load R3, (R3)	    		1 010 1111      //load 17 into R3 from M[1]
 
-sub17:						//this is where we loop a subtraction of the shifted 17...for example 100010000000 - 17 repeatedly until under 6^p
+
+sub17:
 Sub R2, R3			0 001 1011      //While (R2 > 6^p): R2 = R2 - 17
-sltR1 R0, R2                    1 110 0010      //10001..<6^p   R1=1
-bezR1 R3                        0 101 0011     //since R1=1 go back 4 to sub17 loop position
+sltR1 R2, R0                    1 110 1000      //if R2 < R0: R1 = 1  / 10001..<6^p   R1=0
+bezR1 R3                        0 101 0011      //If R1=1 go forward
+/
+/
+/
+/
+/
+/
+/
+/
+/
+/
+/
+/
+/
+/
+jump R3				1 100 0011	// Jump to sub17
+/
 sub R0, R2                      0 001 0010      //Result = 6^p - R2 = 6^p mod 17
-store R0, (R3)                  0 011 0011      //store result into memory and we are done	
+store R0, (R3)                  0 011 0011      //store result into memory and we are done
+Finish				1 111 1111	//End
+
+01110010
+
+11110110
+
+00101011
+
+11101110
+
+11110101
+
+01111000
+
+01111000
+
+01111000
+
+01111000
+
+11010010
+
+11110110
+
+00001111
+
+00110011
+
+11110011
+
+10001101
+
+11110101
+
+01111000
+
+01111000
+
+01111000
+
+01111000
+
+00001001
+
+10111011
+
+01111000
+
+11101000
+
+00001111
+
+00001111
+
+00001111
+
+01010011
+
+01110111
+
+00001111
+
+10100011
+
+10001101
+
+10101111
+
+00011011
+
+11101000
+
+01010011
+
+01010011
+
+01010011
+
+01010011
+
+01010011
+
+01010011
+
+01010011
+
+01010011
+
+01010011
+
+01010011
+
+01010011
+
+01010011
+
+01010011
+
+01010011
+
+01010011
+
+01010011
+
+01010011
+
+01010011
+
+01010011
+
+01010011
+
+01010011
+
+01010011
+
+01010011
+
+01010011
